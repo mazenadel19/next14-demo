@@ -1,4 +1,5 @@
 import { supabase } from "@/supabase";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 const QuizForm = () => {
@@ -12,7 +13,6 @@ const QuizForm = () => {
         const answer2 = formData.get('answer-2')
         const check1 = formData.get('check-1') === 'on'
         const check2 = formData.get('check-2') === 'on'
-        const answers = [{ answer: answer1, is_correct: check1 }, { answer: answer2, is_correct: check2 }]
 
         await supabase
             .from('questions')
@@ -32,20 +32,20 @@ const QuizForm = () => {
         if (Array.isArray(quizData) && quizData.length > 0) {
             const quizId = quizData[0].id
 
-            for (let answer of answers) {
-                const { status:answerStatus, error: answerError } = await supabase
-                    .from('answers')
-                    .insert([
-                        { quiz_id: quizId, answer_text: answer.answer, is_correct: answer.is_correct }
-                    ])
+            const { status: answerStatus, error: answerError } = await supabase
+                .from('answers')
+                .insert([
+                    { quiz_id: quizId, answer_text: answer1, is_correct: check1 },
+                    { quiz_id: quizId, answer_text: answer2, is_correct: check2 }
+                ])
 
-                if (answerError) {
-                    console.error(answerError)
-                    return
-                } else {
-                    console.log(answerStatus)
-                    redirect('/');
-                }
+            if (answerError) {
+                console.error(answerError)
+                return
+            } else {
+                console.log('success .. status: ', answerStatus)
+                revalidatePath('/');
+                redirect('/');
             }
         }
     }
