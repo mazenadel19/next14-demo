@@ -15,7 +15,7 @@ async function Quizzes() {
       <ul className='grid grid-cols-3 w-100'>
         {data.map((quiz) => (
           <li key={quiz.id} className='p-4 justify-center flex text-sky-500 hover:text-sky-700 hover:underline'>
-            <Link href={`/quiz/${quiz.id}`}>{quiz.question_text}</Link>
+            <Link href={`/quiz/${quiz.id}`}>{quiz.title}</Link>
           </li>
         ))}
       </ul>
@@ -30,6 +30,11 @@ export default function Home() {
       <Suspense fallback={<p>Loading...</p>}>
         <Quizzes />
       </Suspense>
+      <div>
+        <Link href="/create-quiz" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Create New Quiz
+        </Link>
+      </div>
     </main>
   )
 }

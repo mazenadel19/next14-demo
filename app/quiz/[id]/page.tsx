@@ -1,6 +1,6 @@
+import { supabase } from "@/supabase";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { supabase } from "@/supabase";
 
 async function Quiz({ id, show }: { id: string, show?: boolean }) {
     const { data, error } = await supabase
@@ -18,6 +18,7 @@ async function Quiz({ id, show }: { id: string, show?: boolean }) {
     )
   `).eq('id', id);
 
+
     if (error) {
         console.error('Error:', error);
         return (
@@ -26,25 +27,24 @@ async function Quiz({ id, show }: { id: string, show?: boolean }) {
     } else {
         const question = data[0]
         return (
-            <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-                <p className="italic text-gray-600 mb-4">{question.description}</p>
-                <ul className="list-disc pl-6">
+            <div className="bg-white p-6 rounded-lg shadow-md my-8">
+                <p className="text-gray-600 mb-4 text-lg">{question.question_text}</p>
+                <p className="italic text-gray-600 mb-4 text-md">{question.description}</p>
+                <ul className="list-disc pl-6 space-y-2">
                     {question.answers.map((answer) => {
                         const isCorrect = answer.is_correct ? 'text-green-700' : 'text-red-700'
                         const revealAnswers = show ? isCorrect : ""
                         return (
-                            <li key={answer.id} className={`mb-1 ${revealAnswers}`}>
+                            <li key={answer.id} className={`mb-1 ${revealAnswers} text-lg`}>
                                 {answer.answer_text}
                             </li>
                         )
-                    }
-                    )}
+                    })}
                 </ul>
             </div>
         );
     }
 }
-
 
 interface Props {
     params: {
@@ -57,26 +57,25 @@ interface Props {
 
 function QuizPage({ params, searchParams }: Props) {
     return (
-        <section>
-            <ul>
+        <section className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+            <ul className="list-none">
                 <li>
-                    <Link href="/" className='p-4 text-sky-500 hover:text-sky-700 hover:underline'>
-                        🔙 Go back
+                    <Link href="/" className='p-4 text-sky-500 hover:text-sky-700 hover:underline transition duration-200 ease-in-out'>
+                        Go back
                     </Link>
                 </li>
             </ul>
-            <br />
             <Quiz id={params.id} show={searchParams?.show} />
-            <br />
             <form action={async () => {
                 'use server';
                 redirect(`/quiz/${params.id}?show=true`);
             }}>
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200 ease-in-out">
                     Reveal Correct Answer
                 </button>
             </form>
         </section>
+
     )
 }
 
